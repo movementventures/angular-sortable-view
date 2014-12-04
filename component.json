@@ -2,6 +2,7 @@
   "name": "qzzr-taker-components",
   "main": "src/angular-sortable-view.js",
   "scripts": [
+    "src/angular-sortable-view.js"
   ],
   "templates": [
   ],

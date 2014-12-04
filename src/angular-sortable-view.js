@@ -604,4 +604,4 @@
 
 })(window, window.angular);
 
-exports.name = 'angular-sortable-view';
+module.exports.name = 'angular-sortable-view';

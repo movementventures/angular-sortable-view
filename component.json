@@ -1,4 +1,5 @@
 {
+  "version": "0.0.11",
   "repo": "movementventures/angular-sortable-view",
   "name": "angular-sortable-view",
   "main": "src/angular-sortable-view.js",

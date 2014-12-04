@@ -9,6 +9,7 @@
 	/* jshint -W041 */
 
 	var module = angular.module('angular-sortable-view', []);
+
 	module.directive('svRoot', [function(){
 		function shouldBeAfter(elem, pointer, isGrid){
 			return isGrid ? elem.x - pointer.x < 0 : elem.y - pointer.y < 0;
@@ -604,4 +605,4 @@
 
 })(window, window.angular);
 
-module.exports.name = 'angular-sortable-view';
+exports.name = 'angular-sortable-view';

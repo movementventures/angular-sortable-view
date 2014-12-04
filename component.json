@@ -1,5 +1,5 @@
 {
-  "name": "qzzr-taker-components",
+  "name": "angular-sortable-view",
   "main": "src/angular-sortable-view.js",
   "scripts": [
     "src/angular-sortable-view.js"

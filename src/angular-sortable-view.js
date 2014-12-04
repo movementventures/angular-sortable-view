@@ -603,3 +603,5 @@
 	};
 
 })(window, window.angular);
+
+exports.name = 'angular-sortable-view';

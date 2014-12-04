@@ -2,7 +2,8 @@
   "name": "angular-sortable-view",
   "main": "src/angular-sortable-view.js",
   "scripts": [
-    "src/angular-sortable-view.js"
+    "src/angular-sortable-view.js",
+    "pkg.js"
   ],
   "templates": [
   ],

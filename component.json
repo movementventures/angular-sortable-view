@@ -1,0 +1,11 @@
+{
+  "name": "qzzr-taker-components",
+  "main": "src/angular-sortable-view.js",
+  "scripts": [
+  ],
+  "templates": [
+  ],
+  "dependencies": {
+  },
+  "paths": []
+}

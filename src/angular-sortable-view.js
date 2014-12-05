@@ -266,15 +266,16 @@
 							$target.view.model($target.view.scope).splice(targetIndex, 0, spliced[0]);
 
 							// sv-on-sort callback
-							if($target.view !== originatingPart || index !== targetIndex)
-								onSort($scope, {
+							if($target.view !== originatingPart || index !== targetIndex) {
+								var evtObj = {
 									$partTo: $target.view.model($target.view.scope),
 									$partFrom: originatingPart.model(originatingPart.scope),
 									$item: spliced[0],
 									$indexTo: targetIndex,
 									$indexFrom: index
-								});
-
+								};
+								onSort($scope, evtObj);
+							}
 						}
 						$target = void 0;
 
@@ -339,12 +340,33 @@
 		};
 	}]);
 
+	module.directive('svElementOnSort', ['$parse', function ($parse) {
+		return {
+			restrict: 'A',
+			scope: {
+				fn:'&svElementOnSort'
+			},
+			require: ['^svElement', '^svRoot'],
+			link: function ($scope, $element, $attrs, $controllers) {
+				$scope.$watch('fn', function (listener) {
+					if (listener) {
+						$controllers[0].registerElementOnSort($scope.fn);		
+					}
+				});
+			}
+		}
+	}]);
+
 	module.directive('svElement', ['$parse', function($parse){
+		var elementOnSortListeners = {};
 		return {
 			restrict: 'A',
 			require: ['^svPart', '^svRoot'],
 			controller: ['$scope', function($scope){
 				$scope.$ctrl = this;
+				this.registerElementOnSort = function (listener) {
+					elementOnSortListeners[$scope.$id] = listener;
+				};
 			}],
 			link: function($scope, $element, $attrs, $controllers){
 				var sortableElement = {
@@ -354,6 +376,7 @@
 						return $scope.$index;
 					}
 				};
+				
 				$controllers[1].addToSortableElements(sortableElement);
 				$scope.$on('$destroy', function(){
 					$controllers[1].removeFromSortableElements(sortableElement);
@@ -459,8 +482,10 @@
 						html.off('mousemove touchmove', onMousemove);
 						html.off('mouseup touchend', mouseup);
 						html.removeClass('sv-sorting-in-progress');
-						if(moveExecuted)
+						if(moveExecuted) {
 							$controllers[0].$drop($scope.$index, opts);
+							elementOnSortListeners[$scope.$id].apply(this);
+						}
 						else
 							$element.removeClass('sv-visibility-hidden');
 					});

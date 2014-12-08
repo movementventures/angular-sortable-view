@@ -21,6 +21,7 @@
 			delete ROOTS_MAP[key];
 		}
 
+		var sortListeners = [];
 		var sortingInProgress;
 		var ROOTS_MAP = Object.create(null);
 		// window.ROOTS_MAP = ROOTS_MAP; // for debug purposes
@@ -40,6 +41,13 @@
 				var $target; // last best candidate
 				var isGrid = false;
 				var onSort = $parse($attrs.svOnSort);
+				
+
+				this.callWhenSorted = function (listener) {
+					if (sortListeners.indexOf(listener) < 0) {
+						sortListeners.push(listener);
+					}
+				}
 
 				// ----- hack due to https://github.com/angular/angular.js/issues/8044
 				$attrs.svOnStart = $attrs.$$element[0].attributes['sv-on-start'];
@@ -275,6 +283,14 @@
 									$indexFrom: index
 								};
 								onSort($scope, evtObj);
+								
+								if (sortListeners.length) {
+									for(var i = 0; i < sortListeners.length; i++) {
+										$parse(sortListeners[i])(evtObj);
+									}
+									
+									sortListeners = [];
+								}
 							}
 						}
 						$target = void 0;
@@ -350,7 +366,7 @@
 			link: function ($scope, $element, $attrs, $controllers) {
 				$scope.$watch('fn', function (listener) {
 					if (listener) {
-						$controllers[0].registerElementOnSort($scope.fn);		
+						$controllers[0].registerElementOnSort($scope.fn);
 					}
 				});
 			}
@@ -358,13 +374,14 @@
 	}]);
 
 	module.directive('svElement', ['$parse', function($parse){
-		var elementOnSortListeners = {};
+		var elementOnSortListeners;
 		return {
 			restrict: 'A',
 			require: ['^svPart', '^svRoot'],
 			controller: ['$scope', function($scope){
 				$scope.$ctrl = this;
 				this.registerElementOnSort = function (listener) {
+					if (!elementOnSortListeners) elementOnSortListeners = {};
 					elementOnSortListeners[$scope.$id] = listener;
 				};
 			}],
@@ -377,6 +394,10 @@
 					}
 				};
 				
+				if (elementOnSortListeners) {
+					$controllers[0].registerSortListener(onSortHandler);
+				}
+
 				$controllers[1].addToSortableElements(sortableElement);
 				$scope.$on('$destroy', function(){
 					$controllers[1].removeFromSortableElements(sortableElement);
@@ -483,11 +504,11 @@
 						html.off('mouseup touchend', mouseup);
 						html.removeClass('sv-sorting-in-progress');
 						if(moveExecuted) {
+							$controllers[1].callWhenSorted(elementOnSortListeners[$scope.$id]);
 							$controllers[0].$drop($scope.$index, opts);
-							elementOnSortListeners[$scope.$id].apply(this);
-						}
-						else
+						} else {
 							$element.removeClass('sv-visibility-hidden');
+						}
 					});
 
 					// onMousemove(e);
@@ -503,6 +524,15 @@
 							offset: pointerOffset
 						}, clone, $element, placeholder, $controllers[0].getPart(), $scope.$index);
 					}
+				}
+
+				function onSortHandler (evt) {
+					$scope.$partTo = evt.$partTo;
+					$scope.$partFrom = evt.$partFrom;
+					$scope.$item = evt.$item;
+					$scope.$indexTo = evt.$indexTo;
+					$scope.$indexFrom = evt.$indexFrom;
+					elementOnSortListeners[$scope.$id].apply(this);
 				}
 			}
 		};

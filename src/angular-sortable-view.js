@@ -393,10 +393,6 @@
 						return $scope.$index;
 					}
 				};
-				
-				if (elementOnSortListeners) {
-					$controllers[0].registerSortListener(onSortHandler);
-				}
 
 				$controllers[1].addToSortableElements(sortableElement);
 				$scope.$on('$destroy', function(){

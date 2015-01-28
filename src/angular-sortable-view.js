@@ -454,9 +454,10 @@
 					if(helper){
 						clone = helper.clone();
 						clone.removeClass('ng-hide');
-						clone.css({
+						clone.addClass('sv-helper').css({
 							'left': clientRect.left + document.body.scrollLeft + 'px',
-							'top': clientRect.top + document.body.scrollTop + 'px'
+							'top': clientRect.top + document.body.scrollTop + 'px',
+							'width': clientRect.width + 'px'
 						});
 						target.addClass('sv-visibility-hidden');
 					}
@@ -502,9 +503,9 @@
 						if(moveExecuted) {
 							$controllers[1].callWhenSorted(elementOnSortListeners[$scope.$id]);
 							$controllers[0].$drop($scope.$index, opts);
-						} else {
-							$element.removeClass('sv-visibility-hidden');
+
 						}
+						$element.removeClass('sv-visibility-hidden');
 					});
 
 					// onMousemove(e);
